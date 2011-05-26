@@ -1,0 +1,1068 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman bookman
+\font_sans cmss
+\font_typewriter lmtt
+\font_default_family rmdefault
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_title "F3G v0.50 documentation"
+\pdf_author "Marcus Jansson"
+\pdf_subject "F3G - Fast Frequency Function Generator"
+\pdf_keywords "frequency function generator square wave signal avr tiny45"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Fast Frequency Function Generator v0.5
+\end_layout
+
+\begin_layout Author
+Marcus Jansson
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+                            ___
+\end_layout
+
+\begin_layout Plain Layout
+
+                     __    |   |    __
+\end_layout
+
+\begin_layout Plain Layout
+
+                _   |  |   |   |   |  |   _
+\end_layout
+
+\begin_layout Plain Layout
+
+            _._| |__|  |___|   |___|  |__| |_._
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+              Fast Frequency Function Generator
+\end_layout
+
+\begin_layout Plain Layout
+
+            _ _   __    ___     ___    __   _ _
+\end_layout
+
+\begin_layout Plain Layout
+
+             ' |_|  |  |   |   |   |  |  |_| '
+\end_layout
+
+\begin_layout Plain Layout
+
+                    |__|   |   |   |__|
+\end_layout
+
+\begin_layout Plain Layout
+
+                           |___| 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This is the documentation for the Fast Frequency Function Generator (F3G)
+ v0.5 built around an AVR ATtiny45 microcontroller (MCU).
+ 
+\end_layout
+
+\begin_layout Standard
+The F3G produce a variable stable square wave signal in the range of 15.4
+ Hz - 5.3 MHz which can be used in a variety of applications.
+\end_layout
+
+\begin_layout Standard
+The goal for the F3G was to make a signal generator to test the new/old
+ analog oscillator in possession of the author.
+\end_layout
+
+\begin_layout Section
+Materials and methods
+\end_layout
+
+\begin_layout Subsection
+Hardware
+\end_layout
+
+\begin_layout Standard
+During the development the following materials were used:
+\end_layout
+
+\begin_layout Itemize
+Atmel STK500 development board.
+\end_layout
+
+\begin_layout Itemize
+A custom control board with pin head connector, potentiometer and button.
+\end_layout
+
+\begin_layout Itemize
+AVR ATtiny45 MCU DIP8 chip.
+\end_layout
+
+\begin_layout Itemize
+TRiO CS-1022 20 MHz oscilloscope.
+\end_layout
+
+\begin_layout Itemize
+PC for development of source code and programming of the MCU.
+\end_layout
+
+\begin_layout Itemize
+Datasheets and manuals, see References.
+\end_layout
+
+\begin_layout Subsection
+Hardware setup
+\end_layout
+
+\begin_layout Subsubsection
+Development board
+\end_layout
+
+\begin_layout Standard
+The STK500 was wired as follows:
+\end_layout
+
+\begin_layout Itemize
+ISP6PIN -> SPROG1
+\end_layout
+
+\begin_layout Itemize
+PORTE.RST -> PORTB.PB5
+\end_layout
+
+\begin_layout Itemize
+PORTE.XT1 -> PORTB.PB3
+\end_layout
+
+\begin_layout Itemize
+The custom control board was attached to the STK500 Vtarg, GND, PORTB.PB2
+ (button), PORTB.PB4 (potentiometer).
+\end_layout
+
+\begin_layout Itemize
+The oscilloscope probe tip and ground clip was connected to the STK500 PORTB.PB1
+ (OCR1A) and GND, respectively.
+\end_layout
+
+\begin_layout Itemize
+The AVR ATtiny45 was attached to the STK500 socket SCKT3400D1 with pin 1
+ in the correct orientation.
+ 
+\end_layout
+
+\begin_layout Itemize
+The STK500 RS-232 CTRL port was connected to a laptop PC through a RS-232
+ <-> USB converter, appearing as /dev/ttyUSB0 on the GNU/Linux system.
+\end_layout
+
+\begin_layout Itemize
+The STK500 was set to run at 3.3V by using avrdude terminal option for vtarg.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Itemize
+
+#$ avrdude -pt45 -cstk500v2 -P/dev/ttyUSB0 -t
+\end_layout
+
+\begin_layout Itemize
+
+...
+\end_layout
+
+\begin_layout Itemize
+
+# vtarg 3.3
+\end_layout
+
+\begin_layout Itemize
+
+# q
+\end_layout
+
+\begin_layout Itemize
+
+#$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+MCU Fuses
+\end_layout
+
+\begin_layout Standard
+The fuses of the AVR ATtiny45 was set to their factory defaults by using
+ avrdude, giving a clk
+\begin_inset Formula $_{\text{I/O}}$
+\end_inset
+
+ of 1 MHz:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fuse
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Factory default value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lfuse
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0x64
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hfuse
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0xdf
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+efuse
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0xff
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#$ avrdude -pt45 -cstk500v2 -P/dev/ttyUSB0 -U lfuse:w:0x64:m
+\end_layout
+
+\begin_layout Plain Layout
+
+#$ avrdude -pt45 -cstk500v2 -P/dev/ttyUSB0 -U hfuse:w:0xdf:m
+\end_layout
+
+\begin_layout Plain Layout
+
+#$ avrdude -pt45 -cstk500v2 -P/dev/ttyUSB0 -U efuse:w:0xff:m
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Software tools
+\end_layout
+
+\begin_layout Standard
+These are the software tools that were used during development:
+\end_layout
+
+\begin_layout Itemize
+GNU/Linux was used on a PC development system.
+ 
+\end_layout
+
+\begin_layout Itemize
+GNU AVR toolchain 4.3.5 was used for compilation of the C source code.
+\end_layout
+
+\begin_layout Itemize
+GNU make 3.81 was used for the makefile system.
+\end_layout
+
+\begin_layout Itemize
+avrdude 5.10 was used for programming the MCU.
+\end_layout
+
+\begin_layout Itemize
+geany 0.20 was used to write the C source code.
+\end_layout
+
+\begin_layout Itemize
+lyx 1.6.7 was used to write the documentation.
+\end_layout
+
+\begin_layout Standard
+A GNU makefile system was created and C source code was written.
+ Debugging and adaption of the custom contol board was done simultaneously,
+ each function added and tested separately.
+\end_layout
+
+\begin_layout Subsection
+Firmware source code
+\end_layout
+
+\begin_layout Standard
+The F3G system roughly consist of these modules:
+\end_layout
+
+\begin_layout Itemize
+Initialization
+\end_layout
+
+\begin_layout Itemize
+Main loop
+\end_layout
+
+\begin_layout Itemize
+Timer0 module
+\end_layout
+
+\begin_layout Itemize
+Timer1 module
+\end_layout
+
+\begin_layout Itemize
+ADC module
+\end_layout
+
+\begin_layout Itemize
+GPIO module
+\end_layout
+
+\begin_layout Standard
+A brief explanation of each module follows:
+\end_layout
+
+\begin_layout Subsubsection
+Initialization
+\end_layout
+
+\begin_layout Standard
+Initialization of the system is done by these steps: 
+\end_layout
+
+\begin_layout Enumerate
+Turn off power to unused peripherals in the MCU.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Initialization of ADC, GPIOs, timers and PLL.
+\end_layout
+
+\begin_layout Enumerate
+Enable global interrupts.
+\end_layout
+
+\begin_layout Subsubsection
+Main loop
+\end_layout
+
+\begin_layout Enumerate
+Main loop enter idle sleep mode.
+ 
+\end_layout
+
+\begin_layout Enumerate
+When a timer0 or pin change interrupt occur the MCU is woken from sleep
+ and an interrupt service routine (ISR) is executed.
+ 
+\end_layout
+
+\begin_layout Enumerate
+When the ISR is done the main loop resume execution.
+\end_layout
+
+\begin_layout Enumerate
+Status of the button is checked and action is taken accordingly.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The main loop enter idle sleep mode again.
+\end_layout
+
+\begin_layout Subsubsection
+ADC module
+\end_layout
+
+\begin_layout Standard
+The ADC module keeps the ADC peripheral turned off when not used to save
+ power.
+\end_layout
+
+\begin_layout Enumerate
+Initialization
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The ADC clock is initialized to run at 500 kHz.
+ The ADC use the Vcc as voltage reference.
+ No autotrigger is used.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+ADC ISR
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The ADC ISR is responsible for reading the 10-bit ADC value and setting
+ the timer1 frequency.
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+GPIO module
+\end_layout
+
+\begin_layout Standard
+The GPIO module is responsible for operating GPIOs.
+\end_layout
+
+\begin_layout Standard
+The GPIO module uses the pin change interrupt (PCINT) to detect if a button
+ have been pressed.
+ PCINT0 ISR sets a flag whenever the button is pressed or released which
+ others can use by the 
+\emph on
+isButtonPressed()
+\emph default
+ function.
+\end_layout
+
+\begin_layout Subsubsection
+Timer0 module
+\end_layout
+
+\begin_layout Standard
+Timer0 is the overall system timer that control the firmware.
+ It consists roughly of these parts:
+\end_layout
+
+\begin_layout Enumerate
+Initialization of timer0.
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The timer0 waveform is set to phase corrected pulse width modulation (PWM)
+ to get as slow overflow (OVF) interrupt frequency as possible from timer0.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Timer0 OVF ISR:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Start a ADC conversion.
+\end_layout
+
+\begin_layout Enumerate
+Toggle a LED to indicate that the system is alive.
+\end_layout
+
+\begin_layout Enumerate
+Update the global systick variable for time keeping.
+\end_layout
+
+\begin_layout Enumerate
+Run the jitterReduction() function to reduce jitter from ADC noice.
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+Timer1 module
+\end_layout
+
+\begin_layout Standard
+Timer1 handle the PLL PWM signal and output to OCR1A.
+ It doesnt generate any interrupts, as that would increase time out of sleep
+ mode.
+\end_layout
+
+\begin_layout Standard
+When the button is pressed the timer1 changes its base frequency prescaler
+ value in a fixed cycle.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+Frequency_{base}=\frac{PCK}{2^{N}}\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where PCK is the PLL frequency, 64 MHz, and N={0..14}
+\end_layout
+
+\begin_layout Subsection
+Power considerations
+\end_layout
+
+\begin_layout Standard
+The ADC peripheral make the MCU consume 5% more current in active mode and
+ 25% more current in idle sleep mode.
+ Therefore it is important to turn the ADC peripheral off when it is not
+ used.
+ The drawback is that turning ADC on and doing a single ADC conversion takes
+ 25 ADC clock cycles instead of 13 ADC clock cycles as from an already running
+ ADC.
+ This extra time adds very litte to the overall consumption, given the ADC
+ is turned off during idle sleep mode.
+\end_layout
+
+\begin_layout Subsection
+Compilation and programming
+\end_layout
+
+\begin_layout Standard
+Compiling the source code is done by invoking make in the f3g directory:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#$ make
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Programming the firmware to the MCU is done by:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#$ make program
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+A stable square signal is generated on PORTB.PB1 (OCR1A).
+ The signal is variable in the range 15.4 Hz - 5.3 MHz by a potentiometer
+ and button.
+ The normally noisy ADC potentiometer reading is stabilized by the C program
+ without affecting the resolution of the potentiometer setting.
+\end_layout
+
+\begin_layout Standard
+The firmware uses approximately 25% of the available flash space in the
+ AVR ATtiny45 MCU.
+\end_layout
+
+\begin_layout Section
+Discussion
+\end_layout
+
+\begin_layout Subsection
+MCU
+\end_layout
+
+\begin_layout Standard
+The MCU AVR ATtiny45 was choosen for its phase lock loop (PLL) capability
+ that can generate a clock signal @ 64 MHz from the internal 8 MHz RC oscillator.
+ And also because it has an analog to digital converter (ADC) peripheral.
+ The 8-bit MCU make development fast and simple.
+\end_layout
+
+\begin_layout Standard
+The AVR ATtiny45 can run at 5V instead of 3.3V.
+ The choise to run on 3.3V was to make it directly compatible with other
+ 3.3V MCU systems.
+\end_layout
+
+\begin_layout Subsection
+Oscilloscope
+\end_layout
+
+\begin_layout Standard
+The analog 20 MHz oscilloscope was suitable for analysis of the produced
+ square wave signal.
+\end_layout
+
+\begin_layout Subsection
+Development board
+\end_layout
+
+\begin_layout Standard
+The STK500 development board was used to speed up development instead of
+ building a full custom board for the MCU.
+ 
+\end_layout
+
+\begin_layout Subsection
+Timer0
+\end_layout
+
+\begin_layout Standard
+The settings of timer0 was choosen to have the slowest possible overflow
+ interrupt frequency in order to keep the MCU in idle sleep mode as much
+ as possible.
+ This is important since it is the timer0 overflow interrupt that wake and
+ start the ADC to read the potentiometer.
+\end_layout
+
+\begin_layout Standard
+This was realised by a phase corrected PWM waveform and highest possible
+ prescaler, clk
+\begin_inset Formula $_{\text{I/O}}$
+\end_inset
+
+/1024.
+ This gives a timer0 overflow interrupt frequency of:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Formula $F_{timer0_{ovf}}=\frac{clk_{I/O}}{Prescale*2*count_{ovf}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where the *2 factor is due to the phase corrected PWM counting both up and
+ down.
+\end_layout
+
+\begin_layout Standard
+Timer0 have a 8-bit counter giving a count
+\begin_inset Formula $_{\text{ovf}}$
+\end_inset
+
+ = 256.
+ With the I/O clock at 1 MHz and prescale factor of 1024 the interrupt frequency
+ is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+F_{timer0_{ovf}}=\frac{1MHz}{1024*2*256}\approx1.9Hz\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To save even more power the potentiometer could be read only after N successive
+ timer0 overflow interrupts.
+ However, this will have a negative influence on the responsiveness.
+ To take this to the extreme the potentiometer could be read only by pressing
+ a button simultaneously.
+ Since these options would not be user friendly they were discarded.
+\end_layout
+
+\begin_layout Subsection
+Timer1
+\end_layout
+
+\begin_layout Standard
+Timer1 runs from the PLL @ 64 MHz and generate the square wave output on
+ OCR1A.
+ It is important that no interrupts due to timer1 occur, since the interrupts
+ would probably not be served fast enough by the much slower CPU.
+ This would keep the MCU off from idle sleep mode and consume more power.
+ 
+\end_layout
+
+\begin_layout Subsection
+ADC
+\end_layout
+
+\begin_layout Standard
+To increase precision in the ADC measurement the ADC noice reduction sleep
+ mode could have been used.
+ However, this sleep mode stop all timers.
+ Stopping timer1 is not desired, since timer1 produces the square wave output
+ on OCR1A.
+\end_layout
+
+\begin_layout Standard
+No autotrigger of the ADC is used, eventhough timer0 OVF autotrigger could
+ be used and resulting in less code execution and more time in idle sleep
+ mode.
+\end_layout
+
+\begin_layout Standard
+The ADC clock is initialized to run at 500 kHz.
+ This is outside the recommended 50 kHz - 200 kHz range for accurate ADC
+ measurement.
+ But as the ADC noice make precision poor anyway this higher frequency was
+ choosen to allow more time in idle sleep mode.
+ 500 kHz is still below 1 MHz, which is the maximum recommended sampling
+ rate.
+ 
+\end_layout
+
+\begin_layout Standard
+The ADC ISR is responsible for setting the timer1 frequency.
+ This is done so the timer1 frequency will be given the current ADC value,
+ instead of the old value, which would be the case if timer0 ISR or main
+ loop is responsible for the frequency setting while the ADC conversion
+ is still running.
+\end_layout
+
+\begin_layout Subsection
+Problems
+\end_layout
+
+\begin_layout Subsection
+Hardware
+\end_layout
+
+\begin_layout Standard
+A better potentiometer and better custom control board would reduce ADC
+ noice and potentially increase the range and stability of the produced
+ square wave signal.
+\end_layout
+
+\begin_layout Standard
+When connecting the button a too large resistor was tried at first, resulting
+ in the signal not getting low enough.
+ Changing to a lower resistance made the button work better.
+\end_layout
+
+\begin_layout Standard
+The button have alot of contact switch bouncing, which have to be handled
+ by software.
+\end_layout
+
+\begin_layout Subsection
+Software
+\end_layout
+
+\begin_layout Standard
+There are a few limitations to the code:
+\end_layout
+
+\begin_layout Itemize
+The ADC readings are very noicy, making the variable signal jittering.
+ A jitter reduction functionality had to be added.
+ This jitter reduction does however not produce a stable square wave during
+ the time the potentiometer is twisted.
+ Only after a short period of time after the potentiometer is set to a value
+ the jitter reduction will come into effect.
+ This is intentional to allow as much fine tuning of the potentiometer setting
+ as possible.
+ But makes the system somewhat flakey.
+\end_layout
+
+\begin_layout Itemize
+Some hardcoded values.
+ For instance the setting of the prescaler, selectable by clicking the button,
+ is not remembered from each power on/off cycle of the MCU.
+\end_layout
+
+\begin_layout Itemize
+To speed up development a copy/paste bug could have been avoided.
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+A variable stable square wave signal generator with a signal range of 15.4
+ Hz - 5.3 MHz have been constructed.
+ The signal generator consist of a AVR ATtiny45, a potentiometer and a button.
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Enumerate
+8-bit AVR Microcontroller with 2/4/8KB In-System Programmable Flash, ATtiny45,
+ Rev.
+ 2586N-AVR-04/11.
+\end_layout
+
+\begin_layout Enumerate
+AVR STK500 User guide, Rev.
+ 1925C-AVR-3/03.
+\end_layout
+
+\begin_layout Enumerate
+AVR On-line help [http://support.atmel.no/knowledgebase/avrstudiohelp/]
+\end_layout
+
+\begin_layout Enumerate
+AVR STK500 User guide [http://support.atmel.no/knowledgebase/avrstudiohelp/mergedP
+rojects/STK500/STK500.htm]
+\end_layout
+
+\begin_layout Enumerate
+On-line fuse calculator [http://www.engbedded.com/fusecalc]
+\end_layout
+
+\begin_layout Section
+Future development
+\end_layout
+
+\begin_layout Standard
+Here are suggestions for future development of the F3G:
+\end_layout
+
+\begin_layout Itemize
+Put some of the now hardcoded setting values into EEPROM, to make the MCU
+ remember last user setting.
+ Make the setting values use a circular buffer to reduce EEPROM wear.
+\end_layout
+
+\begin_layout Itemize
+Make a ADC value averaging funtionality, to reduce noise and jitter of the
+ square wave signal.
+\end_layout
+
+\begin_layout Itemize
+Build hardware low-pass filter for the potentiometer.
+\end_layout
+
+\begin_layout Itemize
+Increase the signal range read from the potentiometer.
+\end_layout
+
+\begin_layout Itemize
+Add more buttons and potentiometers and add various functionality to these.
+ E.g.
+ a second potentiometer control the duty cycle of the square wave.
+\end_layout
+
+\begin_layout Itemize
+Enhance the hardware.
+ Make a nice case.
+ Lable the connections.
+ 
+\end_layout
+
+\begin_layout Itemize
+Bootloader for easy firmware upgrade.
+\end_layout
+
+\begin_layout Itemize
+TWI communication with LCD display units, other MCUs etc.
+\end_layout
+
+\begin_layout Itemize
+Add watch dog timer to reset the MCU if something goes wrong.
+\end_layout
+
+\begin_layout Itemize
+Investigate running the MCU on 128 kHz WDT clock.
+\end_layout
+
+\begin_layout Itemize
+Investigate running the MCU on 8 MHz system clock.
+\end_layout
+
+\begin_layout Itemize
+Autotrigger ADC on timer0 OVF.
+\end_layout
+
+\begin_layout Itemize
+Better software debounce of the button.
+\end_layout
+
+\begin_layout Itemize
+Run the F3G on solar cell and/or battery.
+\end_layout
+
+\begin_layout Itemize
+Optimize the code in assembler.
+\end_layout
+
+\begin_layout Itemize
+Structure the code.
+\end_layout
+
+\end_body
+\end_document

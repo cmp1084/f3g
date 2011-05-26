@@ -1,0 +1,13 @@
+avrdude> dump lfuse 0 1
+>>> dump lfuse 0 1
+0000  62                                                |b               |
+
+avrdude> dump hfuse 0 1
+>>> dump hfuse 0 1
+0000  df                                                |.               |
+
+avrdude> dump efuse 0 1
+>>> dump efuse 0 1
+0000  ff                                                |.               |
+
+avrdude: Device signature = 0x1e9206
