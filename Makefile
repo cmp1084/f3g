@@ -98,7 +98,9 @@ SOURCE += $(CPUDIR)/adc.c
 #The driver sources
 ##############################################################
 #SOURCE += $(DRIVERSDIR)/lcd.c
+SOURCE += $(DRIVERSDIR)/button.c
 SOURCE += $(DRIVERSDIR)/led.c
+SOURCE += $(DRIVERSDIR)/pot.c
 
 
 ##############################################################
@@ -196,7 +198,7 @@ TEXTPOSTCOMPILE = @$(ECHO) -e "\r[OK]"
 #Makefile rules
 ##############################################################
 .PHONY: all
-all: makeSureWeAlwaysLink PrintBoardInfo compile ${ELF} ok size crlf
+all: makeSureWeAlwaysLink PrintBoardInfo compile ${ELF} ok size doxygen crlf
 
 compile:
 	@$(TEST) -d $(BINDIR) || $(MKDIR) -p $(BINDIR)
@@ -259,6 +261,10 @@ dragon: $(BINARY)
 readeeprom: $(BINARY)
 	$(PROGRAMMER)  -p${PART} -c${PROGRAMMERTOOL} -PUSB -v eeprom:r:/tmp/eeprom.hex
 
+.PHONY: dumpeeprom
+dumpeeprom: $(BINARY) readeeprom
+	$(LESS) /tmp/eeprom.hex
+
 .PHONY: reset
 reset:
 	$(PROGRAMMER) reset
@@ -288,7 +294,7 @@ kill:
 
 .PHONY: dump
 dump:
-	$(OBJDUMP) -S -x $(ELF)|less
+	$(OBJDUMP) -S -x $(ELF)|$(LESS)
 
 .PHONY: remake
 remake:	clean all

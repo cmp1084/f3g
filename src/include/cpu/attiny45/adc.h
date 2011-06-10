@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -31,19 +31,19 @@
 #ifndef __ADC_H__
 #define __ADC_H__
 
-#include <avr/io.h>
+//~ #include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include "config.h"
-#include "timer.h"
+//~ #include "timer.h"
 
 void adcInit(void);
-static void adcEnable(void);
-static void adcHalt(void);
+//~ static void adcEnable(void);
+//~ static void adcHalt(void);
 void adcDisable(void);
 void adcWaitUntilConversionDone(void);
-void adcDigitalInputDisable(void);
 void adcStartConversion(void);
-int adcGetValue(void);
+unsigned int adcGetValue(void);
+unsigned int adcGetAverageValue(void);
 
 #endif /* __ADC_H__ */

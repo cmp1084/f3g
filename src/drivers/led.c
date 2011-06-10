@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -28,11 +28,14 @@
 *****************************************************************************/
 /* Tab size: 4 */
 
+/** \file led.c
+ * LED functions */
+
 #include "drivers/led.h"
 
 void ledInit(void)
 {
-	gpioInit(LEDPIN);
+	gpioInit(1 << LEDPIN);
 }
 
 void ledToggle(void)

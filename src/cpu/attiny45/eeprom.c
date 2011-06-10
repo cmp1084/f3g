@@ -26,27 +26,52 @@
      You should have received a copy of the GNU General Public License
      along with this.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
-/* Tab size: 4 */
 
-#ifndef __GPIO_H__
-#define __GPIO_H__
+/* EEPROM layout
+ * Available: 256 bytes
+ *
+ * 0x
+ * 0x TWI master address, user selectable, if not set (0xff) use TWI_ADDR_MASTER_DEFAULT (0x45, or similar)
+ * 0x TWI slave address, user selectable, if not set (0xff) use TWI_ADDR_SLAVE_DEFAULT (0x51, or similar)
+ * 0x timer0prescale value
+ * 0x timer1prescale value
+ * 0x Flag, get OC1A settings from EEPROM or ADC (potentiometer)
+ * 0x
+ * 0x
+ * 0x
+ * 0x
+ * 0x
+ *
+ */
 
-//~ #include <avr/io.h>
-//~ #include <avr/interrupt.h>
-//~ #include "pm.h"
-#include "config.h"
-//~ #include "system.h"
+//TODO: see DS page 19, prevent eeprom corruption
 
-char gpioGet(const char pin);
-void gpioInit(const char value);
-void gpioToggle(const char pin);
-void gpioOn(const char pin);
-void gpioOff(const char pin);
+char eepromRead(char addr)
+{
+	//Sleep until the EEPROM is ready to be read
+	while(EECR & (1 << EEPE)) { pmSleep(); }
+	EEARL = addr;							//Set the EEPROM address
+	EECR = (1 << EERE);						//Strobe a EEPROM read
+	return EEDR;							//Return the EEPROM data
+}
 
-//TODO: Not used? remove
-void gpioPcint0Init(void);
-void gpioIrqOn(void);
-void gpioIrqOff(void);
-int isGpioIrqOn(void);
+void eepromWrite(char addr, char byte)
+{
+	//Sleep until the EEPROM is ready to be read (this might be 3.4 ms, maximum)
+	while(EECR & (1 << EEPE)) { pmSleep(); }
+	EEARL = addr;							//Set the EEPROM address
+	EEDR = byte;							//Set the data to write into EEPROM addr
+	interruptDisable();
+	EECR = (0 << EEPM1) | (0 << EEPM0) |	//Atomic write operation
+			(0 << EERIE) |					//Writing a single byte, so there is no need to interrupt
+			(1 << EEMPE)
+	//Within four clocks
+	EECR |= (1 << EEPE);
+	interruptEnable();
+}
 
-#endif /* __GPIO_H__ */
+
+ISR(EE_RDY_vect)
+{
+
+}

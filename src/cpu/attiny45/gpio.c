@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -31,22 +31,14 @@
 #include "gpio.h"
 
 /** \file gpio.c
- * General purpose input output
+ * General purpose input output */
 
-//~ unsigned int gpioButtonPressed;
+//~ unsigned int gpiobuttonPressedFlag;
 
-/*! \brief Flag to see if a button is pressed or not */
-/*! Legal values are YES and NO */
-/*! \see ISR(PCINT0_vect) */
-volatile unsigned int buttonPressed;	//variable that hold YES or NO
 
-/*! \brief is the button pressed? */
-/*! \return YES or NO */
-/* \todo Rename to isPCINTButtonPressed() or similar, if both GPIO buttons and
- * PCINT buttons are used in future versions */
-int isButtonPressed(void)
+char gpioGet(const char pin)
 {
-	return buttonPressed;
+	return PINB & (1 << pin);
 }
 
 void gpioInit(const char value)
@@ -54,27 +46,46 @@ void gpioInit(const char value)
 	DDRB |= value;
 }
 
+/** \brief toggle a GPIO pin
+ *
+ * \todo cli()/sei() only necessary if IRQs are allowed to operate on the GPIO pins.
+ */
 void gpioToggle(const char pin)
 {
-	cli();
+	interruptDisable();
 	PORTB ^= (1 << pin);
-	sei();
+	interruptEnable();
 }
 
 void gpioOn(const char pin)
 {
-	cli();
+	interruptDisable();
 	PORTB |= (1 << pin);
-	sei();
+	interruptEnable();
 }
 
 void gpioOff(const char pin)
 {
-	cli();
+	interruptDisable();
 	PORTB &= ~(1 << pin);
-	sei();
+	interruptEnable();
 }
 
+void gpioIrqOn(void)
+{
+	GIMSK |= (1 << PCIE);
+}
+
+void gpioIrqOff(void)
+{
+	GIMSK &= ~(1 << PCIE);
+}
+
+__attribute__((always_inline))
+int isGpioIrqOn(void)
+{
+	return GIMSK & (1 << PCIE);
+}
 //TODO: If necessary
 //~ int gpioInput(void)
 //~ {
@@ -83,32 +94,58 @@ void gpioOff(const char pin)
 
 //~ void gpioCleanInput(void)
 //~ {
-	//~ gpioButtonPressed = 0;
+	//~ gpiobuttonPressedFlag = 0;
 //~ }
 
-/** \brief Initialize the PCINT0 interrupt
- *
- * \return Nothing */
-/** \todo Make this function nicer */
-#define PCINTPIN PB2
-void gpioPcint0Init(void)
-{
-	GIMSK |= (1 << PCIE);			//Enable Pin Change interrupt
-	PCMSK |= (1 << PCINT2);			//for PCINT2
-	DDRB &= ~(1 << PCINTPIN);		//Make the pin input
-	PORTB |= (1 << PCINTPIN);		//with internal pullup
-}
+//~ #define PCINTPIN PB2
+//~
+//~ /** \brief Initialize the PCINT0 interrupt
+ //~ *
+ //~ * \return Nothing */
+//~ /** \todo Make this function nicer */
+//~ void gpioPcint0Init(void)
+//~ {
+	//~ //GIMSK |= (1 << PCIE);			//Enable Pin Change interrupt
+	//~ gpioIrqOn();
+	//~ PCMSK |= (1 << PCINT2);			//for PCINT2
+	//~ DDRB &= ~(1 << PCINTPIN);		//Make the pin input
+	//~ PORTB |= (1 << PCINTPIN);		//with internal pullup
+//~ }
 
-/** \todo Contact switch bouncing cases some problems here */
-ISR(PCINT0_vect)
-{
-	//Detect button down
-	if(!(PINB & (1 << PCINTPIN))) {
-		//Set the buttonPressed  flag
-		buttonPressed = YES;
-		ledToggle();	//ledOn, usually
-		return;
-	}
-	buttonPressed = NO;
-	ledToggle();		//ledOff, usually
-}
+
+/** \todo Contact switch bouncing causes some problems. The problem should not be solved here, but elsewhere
+ * infact, never connect a button input to an interrupt, due to the contact bouncing
+ * Sort the button out in the timer isr instead */
+//~ ISR(PCINT0_vect)
+//~ {
+	//Just wake up
+
+
+	//~ //Detect button down
+	//~ if(!(PINB & (1 << PCINTPIN))) {
+		//~ buttonPressedFlag = TRUE;
+		//~ ledOn();
+	//~ } else {
+		//~ buttonPressedFlag = FALSE;
+		//~ ledOff();		//ledOff, usually
+	//~ }
+//~ }
+
+//~ ISR(PCINT0_vect)
+//~ {
+	//~ int thisSystick;
+	//~ //Detect button down
+	//~ if(!(PINB & (1 << PCINTPIN))) {
+		//~
+		//~ if(!buttonPressedStillBouncingFlag) {
+			//~ buttonPressedAtSystick = getSystick();
+			//~ buttonPressedStillBouncingFlag = TRUE;
+		//~ }
+		//~ ledOn();
+	//~ } else {
+		//~ if(buttonPressedAtSystick < (getSystick() - BUTTON_DEBOUNCE_PERIOD)) {
+			//~ buttonPressedStillBouncingFlag = FALSE;
+		//~ }
+		//~ ledOff();		//ledOff, usually
+	//~ }
+//~ }

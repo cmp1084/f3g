@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -47,38 +47,52 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+/** \file main.c main program */
+
+//~ #include <avr/io.h>
+//~ #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
+
 
 #include "adc.h"
 #include "config.h"
+//#include "gpio.h"
 #include "pm.h"
+//~ #include "system.h"
 #include "timer.h"
 
+
+#include "drivers/button.h"
 #include "drivers/led.h"
+#include "drivers/pot.h"
 
-PROGMEM const char programname[] = "F3G v0.5 (" __DATE__ ")";
+#define FOREVER 1
 
+PROGMEM const char programname[] = "F3G v0.5.1 (" __DATE__ ")";
+
+//~ __attribute__((naked))
 int main(void)
 {
+	unsigned int pav;
+
 	//Throttle system clock to 8 MHz
-	pmClkPrescale(0);
+	/** \bug Setting other system clock speeds affect the timer speed, naturally. Prescaling to compensate? */
+	pmClkThrottle(SYSCLK);	//Throttle to 1 MHz system clock
+	//~ pmClkThrottle(SYSCLK);	//Throttle to 8 MHz system clock
 
 	//Reduce power consumption
 	pmPowerReduction();
 
-	//Initialize GPIOs, LEDs, Buttons etc. if necessary
-	//~ gpioOn(PB0);	//Turn debug LED off
-	//~ gpioOn(PB1);
-	//~ gpioOn(PB2);
-	//~ gpioInit((1 << PB0) | (1 << PB1)); //TODO: Note, PB1 must be set to output OC1A signal. This is also done by timer1init()
-
-	ledOff();
-	ledInit();
-
 	//ADC init
 	adcInit();
+
+	//Initialize GPIOs, LEDs, Buttons etc. if necessary
+	//Enable the pushbutton internal pull-up resistor
+	buttonInit();
+
+	//Init LED
+	ledOff();
+	ledInit();
 
 	//Initialize timers and PLL
 	timer0Init();
@@ -86,20 +100,35 @@ int main(void)
 	timer1Init();
 
 	//Init PCINT0 interrupt from GPIO lines (used for buttons)
-	gpioPcint0Init();
+	//~ gpioPcint0Init();
 
-	//Initialization done. Start interrupts
-	sei();
-	while(1) {
+	//Initialization done. Allow interrupts.
+	interruptEnable();
+	do {
 		//Put MCU in idle sleep mode
 		pmSleep();
 
-		if(isButtonPressed() == YES) {
-			timer1TogglePrescale();
+		//Detect single click
+		if(isButtonPressed() == TRUE) {
+			//timer1TogglePrescale();
+			ledOn();
+			//Sleep until button is released
 			while(isButtonPressed()) {
 				pmSleep();
 			}
+			ledOff();
 		}
-	};
+		//Test case for double click:
+		if(isDoubleClick() == TRUE) {
+			timer1TogglePrescale();
+		}
+
+
+		pav = potGetAverageValue(5);
+		//~ pav = potGetValue();
+		timer1SetFreq(pav);	//TODO: timer1SetFreq(adcValue);
+
+	} while(FOREVER);
 }
 
+//Something woke the MCU up, was it a PCINT from the button? //TODO: PCINT not used any longer, we come here anyway after each timer0 irq

@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -31,13 +31,18 @@
 #ifndef __PM_H__
 #define __PM_H__
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+//~ #include <avr/io.h>
+//~ #include <avr/interrupt.h>
+
+#include "adc.h"
+#include "config.h"
 
 void pmPowerReduction(void);
 void pmSleep();
+void pmSleepAdcNoiseReduction(void);
 void pmAdcPowerOn(void);
 void pmAdcPowerOff(void);
 void pmClkPrescale(unsigned char prescale);
+void pmClkThrottle(unsigned long desiredfcpu);
 
 #endif /* __PM_H__ */

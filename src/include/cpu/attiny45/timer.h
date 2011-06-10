@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -31,15 +31,24 @@
 #ifndef __TIMER_H__
 #define __TIMER_H__
 
-#include <avr/io.h>
+//~ #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "adc.h"
+//~ #include "adc.h"
+#include "drivers/button.h"
+#include "config.h"
+//~ #include "drivers/led.h"
 
 void timer0Init(void);
 void timer1Init(void);
+void timer0IrqOn(void);
+void timer0IrqOff(void);
+void timer1IrqOn(void);
+void timer1IrqOff(void);
+int isTimer0IrqOn(void);
+int isTimer1IrqOn(void);
 void timer1PllInit(void);
-int timer1SetFreq(const unsigned int value);
+char timer1SetFreq(unsigned int value);
 void timer1TogglePrescale(void);
 
 #endif /* __TIMER_H__  */

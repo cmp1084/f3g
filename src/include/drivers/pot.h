@@ -28,25 +28,16 @@
 *****************************************************************************/
 /* Tab size: 4 */
 
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef __POT_H__
+#define __POT_H__
 
-//~ #include <avr/io.h>
-//~ #include <avr/interrupt.h>
-//~ #include "pm.h"
 #include "config.h"
-//~ #include "system.h"
+#include "adc.h"
 
-char gpioGet(const char pin);
-void gpioInit(const char value);
-void gpioToggle(const char pin);
-void gpioOn(const char pin);
-void gpioOff(const char pin);
+void jitterReduction(void);	//DONE: Make static DONE
+char potGetJitterReductionValue(void);
+void potSetJitterReductionValue(unsigned char value);
+unsigned int potGetValue(void);
+unsigned int potGetAverageValue(char nrOfConversions);
 
-//TODO: Not used? remove
-void gpioPcint0Init(void);
-void gpioIrqOn(void);
-void gpioIrqOff(void);
-int isGpioIrqOn(void);
-
-#endif /* __GPIO_H__ */
+#endif /* __POT_H__ */

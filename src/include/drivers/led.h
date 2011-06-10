@@ -4,7 +4,7 @@
                     _   |  |   |   |   |  |   _
                 _._| |__|  |___|   |___|  |__| |_._
 
-                  Fast Frequency Function Generator
+                 Fast Frequency Function Generator
                 _ _   __    ___     ___    __   _ _
                  ' |_|  |  |   |   |   |  |  |_| '
                         |__|   |   |   |__|
@@ -31,7 +31,7 @@
 #ifndef __LED_H__
 #define __LED_H__
 
-#include <avr/io.h>
+//~ #include <avr/io.h>
 #include "config.h"
 
 void ledInit(void);

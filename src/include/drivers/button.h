@@ -26,27 +26,20 @@
      You should have received a copy of the GNU General Public License
      along with this.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
-/* Tab size: 4 */
+#ifndef __BUTTON_H__
+#define __BUTTON_H__
 
-#ifndef __GPIO_H__
-#define __GPIO_H__
-
-//~ #include <avr/io.h>
-//~ #include <avr/interrupt.h>
-//~ #include "pm.h"
 #include "config.h"
-//~ #include "system.h"
+#include "gpio.h"
 
-char gpioGet(const char pin);
-void gpioInit(const char value);
-void gpioToggle(const char pin);
-void gpioOn(const char pin);
-void gpioOff(const char pin);
+void buttonInit(void);
+char isButtonPressed(void);
+char isDoubleClick(void);
+void updateButtonStatus(void);
 
-//TODO: Not used? remove
-void gpioPcint0Init(void);
-void gpioIrqOn(void);
-void gpioIrqOff(void);
-int isGpioIrqOn(void);
+//~ void doubleClickFlagSet(char value);
+//~ char getDoubleClickFlag(void);
+char isDoubleClick(void);
 
-#endif /* __GPIO_H__ */
+
+#endif /* __BUTTON_H__ */
